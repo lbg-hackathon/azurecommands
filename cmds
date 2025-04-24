@@ -27,3 +27,21 @@ cd next-frontend
 docker build -t hacktaskmgracr.azurecr.io/task-manager-frontend:latest .
 docker push hacktaskmgracr.azurecr.io/task-manager-frontend:latest
 cd ..
+
+
+
+
+
+STEP 7: Deploy Backend Container with Environment Variables
+# Create the Web App for the backend
+az webapp create --resource-group fullname-app-rg --plan fullname-app-plan --name fullname-backend-app --deployment-container-image-name fullnameregistry.azurecr.io/fullname-backend:latest
+
+# Configure registry credentials for the backend
+az webapp config container set --name fullname-backend-app --resource-group fullname-app-rg --docker-custom-image-name fullnameregistry.azurecr.io/fullname-backend:latest --docker-registry-server-url https://fullnameregistry.azurecr.io --docker-registry-server-user $(az acr credential show --name fullnameregistry --query username -o tsv) --docker-registry-server-password $(az acr credential show --name fullnameregistry --query passwords[0].value -o tsv)
+
+# Set environment variables for the backend
+az webapp config appsettings set --resource-group fullname-app-rg --name fullname-backend-app --settings DB_USER=sqlAdmin DB_PASSWORD="YourStrongPassword123!" DB_SERVER=fullname-sql-server.database.windows.net DB_NAME=fullnamedb FRONTEND_URL=https://fullname-frontend-app.azurewebsites.net
+
+# Get the backend URL for setting up the frontend
+BACKEND_URL=$(az webapp show --name fullname-backend-app --resource-group fullname-app-rg --query defaultHostName -o tsv)
+echo "Backend URL: https://$BACKEND_URL"
