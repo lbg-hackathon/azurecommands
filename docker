@@ -1,0 +1,7 @@
+[13:44, 24/04/2025] Aparna Raman: ACR_USERNAME=$(az acr credential show --name oldowankanoberegistry --query username --output tsv)
+ACR_PASSWORD=$(az acr credential show --name oldowankanoberegistry --query passwords[0].value --output tsv)
+[13:44, 24/04/2025] Aparna Raman: echo $ACR_PASSWORD | docker login oldowankanoberegistry.azurecr.io --username $ACR_USERNAME --password-stdin
+[13:45, 24/04/2025] Aparna Raman: az acr login --name oldowankanoberegistry
+[13:45, 24/04/2025] Aparna Raman: cd next-frontend
+docker build -t oldowankanoberegistry.azurecr.io/green-financial-grid:v1 .
+docker push oldowankanoberegistry.azurecr.io/green-financial-grid:v1
