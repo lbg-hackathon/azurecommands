@@ -1,0 +1,29 @@
+# Login to Azure
+az login
+
+# Create a Resource Group if it doesn't exist
+az group create --name oldowan-kanobe-rg --location westeurope
+
+# Create an Azure Container Registry if it doesn't exist
+az acr create --name oldowan-kanobe-acr --resource-group Team02 --sku Standard --admin-enabled true
+
+# Get ACR credentials
+ACR_USERNAME=$(az acr credential show --name hacktaskmgracr --query username --output tsv)
+ACR_PASSWORD=$(az acr credential show --name hacktaskmgracr --query passwords[0].value --output tsv)
+
+# Login to ACR
+docker login hacktaskmgracr.azurecr.io --username $ACR_USERNAME --password $ACR_PASSWORD
+or
+echo $ACR_PASSWORD | docker login hacktaskmgracr.azurecr.io --username $ACR_USERNAME --password-stdin
+
+# Build and push backend image
+cd node-backend
+docker build -t hacktaskmgracr.azurecr.io/task-manager-backend:latest .
+docker push hacktaskmgracr.azurecr.io/task-manager-backend:latest
+cd ..
+
+# Build and push frontend image
+cd next-frontend
+docker build -t hacktaskmgracr.azurecr.io/task-manager-frontend:latest .
+docker push hacktaskmgracr.azurecr.io/task-manager-frontend:latest
+cd ..
